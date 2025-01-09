@@ -17,9 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-urlpatterns = [
-    path("__reload__/", include("django_browser_reload.urls")),
+from proyecto3 import views
 
-    path('admin/', admin.site.urls),
-    path('index', include('proyecto3.urls')),
+urlpatterns = [
+    path('/homepage/', views.homepage_view, name='homepage'),
 ]
