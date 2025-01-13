@@ -1,0 +1,1 @@
+{'kernel': 'linear', 'gamma': 'scale', 'epsilon': np.float64(0.56), 'C': np.float64(1000.0)}

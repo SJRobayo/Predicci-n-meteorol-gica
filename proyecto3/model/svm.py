@@ -1,12 +1,11 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.svm import SVR
-from sklearn.metrics import mean_absolute_error, mean_squared_error
-from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_absolute_error, mean_squared_error, confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import StandardScaler
 from collections import Counter
 
 def entrenar_modelo(X_train, X_test, y_train, y_test, best_params):
@@ -22,39 +21,8 @@ def calcular_matriz_confusion(y_test, y_pred, tolerancia):
     matriz = confusion_matrix(y_test_clasificado, y_pred_clasificado)
     return matriz, y_test_clasificado, y_pred_clasificado
 
-def buscar_mejores_hiperparametros(X, y):
-    print("Buscando mejores hiperparámetros usando RandomizedSearchCV...")
-
-    parametros = {
-        'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
-        'C': np.logspace(-3, 3, 10),
-        'epsilon': np.linspace(0.01, 1, 10),
-        'gamma': ['scale', 'auto']
-    }
-
-    random_search = RandomizedSearchCV(
-        estimator=SVR(),
-        param_distributions=parametros,
-        n_iter=20,
-        scoring='neg_mean_squared_error',
-        cv=3,
-        verbose=2,
-        n_jobs=-1,
-        random_state=42
-    )
-
-    random_search.fit(X, y)
-
-    print("\nMejores hiperparámetros encontrados:")
-    print(random_search.best_params_)
-
-    print("\nMejor puntuación obtenida (MSE):")
-    print(-random_search.best_score_)  # Negativo porque usamos "neg_mean_squared_error"
-
-    return random_search.best_params_
-
-def main():
-    print("=== Predicción del Clima con SVM ===")
+def main_ejecucion():
+    print("=== Ejecución del Modelo ===")
 
     file_path = "C:/Users/Sami/PycharmProjects/proyecto 3/proyecto3/csv/clean_observations.csv"
 
@@ -85,20 +53,10 @@ def main():
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
-    y_clasificado = np.floor(y / 1.0)
-    print("\nDistribución inicial de clases:")
-    print(Counter(y_clasificado))
-
+    # SMOTE
     try:
         smote = SMOTE(random_state=42)
         X, y = smote.fit_resample(X, y)
-        print("\nDespués de aplicar SMOTE:")
-        print("Tamaño de X:", X.shape)
-        print("Tamaño de y:", y.shape)
-
-        y_clasificado_smote = np.floor(y / 1.0)
-        print("\nDistribución de clases después de SMOTE:")
-        print(Counter(y_clasificado_smote))
     except Exception as e:
         print(f"Error al aplicar SMOTE: {e}")
         return
@@ -107,7 +65,13 @@ def main():
         X, y, test_size=0.2, random_state=42
     )
 
-    best_params = buscar_mejores_hiperparametros(X_train, y_train)
+    # Cargar los mejores hiperparámetros
+    try:
+        with open("best_params.txt", "r") as file:
+            best_params = eval(file.read())
+    except Exception as e:
+        print(f"Error al cargar los mejores hiperparámetros: {e}")
+        return
 
     print("Entrenando modelo con los mejores hiperparámetros...")
     y_pred, modelo = entrenar_modelo(X_train, X_test, y_train, y_test, best_params)
@@ -141,4 +105,4 @@ def main():
     plt.show()
 
 if __name__ == "__main__":
-    main()
+    main_ejecucion
