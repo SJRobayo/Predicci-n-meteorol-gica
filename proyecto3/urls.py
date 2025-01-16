@@ -16,9 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .views import predict_view
 
 from proyecto3 import views
 
 urlpatterns = [
-    path('/homepage/', views.homepage_view, name='homepage'),
+    path('/predict/', predict_view, name='predict'),
+
 ]

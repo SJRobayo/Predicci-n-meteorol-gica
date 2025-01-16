@@ -26,7 +26,7 @@ def main():
         return
 
     # Variables de interés
-    features = ['date_id', 'wind', 'precipitation']
+    features = [ 'wind', 'precipitation']
     target = 'weather_id'
 
     # Verificación de columnas

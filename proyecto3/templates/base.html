@@ -1,32 +1,41 @@
-<!-- component -->
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicción del Clima</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div class="bg-gradient-to-tr from-fuchsia-300 to-sky-500">
-    <section id="login" class="p-4 flex flex-col justify-center min-h-screen max-w-md mx-auto">
-        <div class="p-6 bg-sky-100 rounded">
-            <div class="flex flex-col items-center justify-center font-black m-3 mb-12">
-
-                <h1 class="tracking-wide text-2xl text-gray-900">Predicción meteorológica</h1>
-                <div class="flex justify-center w-full mt-8">
-                    <button type="button"
-                            class="text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                        Comenzar
-                    </button>
-                </div>
-
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
+        <h1 class="text-2xl font-bold text-gray-800 text-center mb-4">Predicción del Clima</h1>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="wind" class="block text-sm font-medium text-gray-700">Velocidad del Viento (Wind)</label>
+                {{ form.wind }}
             </div>
-
-
+            <div>
+                <label for="precipitation" class="block text-sm font-medium text-gray-700">Precipitación (Precipitation)</label>
+                {{ form.precipitation }}
+            </div>
+            <div class="text-center">
+                <button type="submit"
+                        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    Predecir
+                </button>
+            </div>
+        </form>
+        {% if prediction %}
+        <div class="mt-4 p-4 bg-green-100 border border-green-300 text-green-800 rounded">
+            <p class="text-center">La predicción es: <span class="font-bold">{{ prediction }}</span></p>
         </div>
-    </section>
-
-
-</div>
+        {% endif %}
+        {% if error %}
+        <div class="mt-4 p-4 bg-red-100 border border-red-300 text-red-800 rounded">
+            <p class="text-center">Error: {{ error }}</p>
+        </div>
+        {% endif %}
+    </div>
 </body>
 </html>
