@@ -1,97 +1,314 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predicción Meteorológica</title>
+    <title>Formulario con Animaciones Dinámicas</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{% static 'js/particles.min.js' %}"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        #particles-js {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: transparent;
+        }
+
+
     </style>
 </head>
 
-<body class="font-poppins bg-gradient-to-r from-blue-400 to-blue-600 h-screen flex items-center justify-center overflow-hidden">
+<body class="relative h-screen flex items-center justify-center">
 
-    <div class="flex flex-col md:flex-row items-start md:space-x-8 space-y-6 md:space-y-0 max-w-6xl w-full px-6 transition-all duration-500 ease-in-out transform scale-100">
-        <!-- Izquierda: Formulario y resultados -->
-        <div class="flex flex-col space-y-6 w-full md:w-2/3 animate-fade-in">
-            <!-- Formulario -->
-            <div class="bg-white rounded-lg shadow-lg p-8 transform hover:scale-105 transition-transform duration-300">
-                <div class="text-center mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800">Predicción del Clima</h1>
-                    <p class="text-gray-600">Introduce los valores para obtener la predicción.</p>
+
+<div id="particles-js"></div>
+
+
+<div class="flex w-full max-w-6xl h-[90vh] px-4">
+
+    <div class="flex flex-col w-1/3 h-full space-y-4">
+
+        <div class="bg-white rounded-lg shadow-lg p-4 flex-[0.35]">
+            <h2 class="text-lg font-bold text-gray-800 text-center mb-2">Formulario</h2>
+            <p class="text-gray-600 text-center text-sm mb-4">Introduce los valores para obtener la predicción.</p>
+            <form method="post" class="space-y-3">
+                {% csrf_token %}
+                <div>
+                    <label for="wind" class="block text-xs font-medium text-gray-700">Velocidad del Viento (m/s)</label>
+                    <input type="number" name="wind" id="wind"
+                           class="w-full mt-1 p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none text-xs">
                 </div>
+                <div>
+                    <label for="precipitation" class="block text-xs font-medium text-gray-700">Precipitación
+                        (ml/m²)</label>
+                    <input type="number" name="precipitation" id="precipitation"
+                           class="w-full mt-1 p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none text-xs">
+                </div>
+                <button type="submit"
+                        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-md shadow-md text-xs transition-transform duration-200 transform hover:scale-105">
+                    Predecir
+                </button>
+            </form>
+        </div>
 
-                <form method="post" class="space-y-4">
-                    {% csrf_token %}
-                    <div>
-                        <label for="wind" class="block text-sm font-medium text-gray-700">Velocidad del Viento (m/s)</label>
-                        <input type="number" name="wind" id="wind" class="w-full mt-2 p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
-                    </div>
-                    <div>
-                        <label for="precipitation" class="block text-sm font-medium text-gray-700">Precipitación (ml/m²)</label>
-                        <input type="number" name="precipitation" id="precipitation" class="w-full mt-2 p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
-                    </div>
-                    <button type="submit"
-                            class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg shadow-lg transition-transform duration-200 transform hover:scale-105">
-                        Predecir
-                    </button>
-                </form>
-            </div>
 
-            <!-- Carta con el resultado -->
+        <div class="bg-white rounded-lg shadow-lg p-4 flex-[0.65] flex flex-col justify-between">
             {% if prediction %}
-            <div class="bg-white rounded-lg shadow-lg p-8 space-y-4 transform transition-transform duration-500 hover:scale-105 animate-fade-in-up">
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-gray-800">{{ prediction }}</div>
-                    <p class="text-gray-600">Aquí tienes la predicción del clima basada en los valores ingresados.</p>
+                <div class="text-center mb-4">
+                    <p class="text-gray-600 text-xs">Predicción del Clima:</p>
+                    <div class="text-lg font-bold text-gray-800">{{ prediction }}</div>
                 </div>
-                <div class="rounded-lg overflow-hidden shadow-lg">
-                    <img src="{{ image_url }}" alt="Clima" class="w-full h-52 object-cover">
+
+                <div class="rounded-lg overflow-hidden shadow-lg h-40 w-full bg-gray-100 flex items-center justify-center">
+                    <img src="{{ image_url }}" alt="Imagen del Clima" class="h-full w-full object-cover">
                 </div>
-            </div>
+            {% else %}
+                   <div class="text-center mb-4">
+                    <p class="text-gray-600 text-xs">Predicción del Clima:</p>
+                    <div class="text-lg font-bold text-gray-800">Por determinar</div>
+                </div>
+
+                <div class="rounded-lg overflow-hidden shadow-lg h-40 w-full bg-gray-100 flex items-center justify-center">
+                    <img src="https://media.tenor.com/Rz44DhwBh_gAAAAi/smw-block.gif" alt="Imagen del Clima" class="h-full w-full object-cover">
+                </div>
             {% endif %}
         </div>
 
-        <!-- Derecha: Contenedor para gráficos -->
-        <div class="bg-white rounded-lg shadow-lg p-8 w-full md:w-1/3 animate-slide-in">
-            <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Gráficos</h2>
-            <p class="text-gray-600 text-center mb-4">Visualización de datos del clima.</p>
-            <div class="h-80 w-full rounded-lg bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300">
-                <span class="text-gray-400">Aquí aparecerán los gráficos</span>
+    </div>
+
+
+    <div class="bg-white rounded-lg shadow-lg p-6 w-2/3 h-full ml-4">
+        <h2 class="text-xl font-bold text-gray-800 text-center mb-4">Detalles del Modelo</h2>
+
+        <!-- Grid de Detalles -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Caja: Nombre del Modelo -->
+            <div class="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center justify-center">
+                <span class="text-sm font-semibold text-gray-600">Nombre del Modelo</span>
+                <span class="text-lg font-bold text-gray-800">SVM </span>
+            </div>
+
+            <!-- Caja: Precisión -->
+            <div class="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center justify-center">
+                <span class="text-sm font-semibold text-gray-600">Precisión</span>
+                <span class="text-lg font-bold text-gray-800">
+            {% if model_info.accuracy %}
+                {{ model_info.accuracy|floatformat:2 }} / 1
+            {% else %}
+                No disponible
+            {% endif %}
+        </span>
+            </div>
+
+            <!-- Caja: Última Actualización -->
+            <div class="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center justify-center">
+                <span class="text-sm font-semibold text-gray-600">Última Actualización</span>
+                <span class="text-lg font-bold text-gray-800">
+            {% if model_info.last_trained %}
+                {{ model_info.last_trained }}
+            {% else %}
+                No disponible
+            {% endif %}
+        </span>
+            </div>
+
+            <!-- Caja: Tamaño del Dataset -->
+            <div class="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center justify-center">
+                <span class="text-sm font-semibold text-gray-600">Tamaño del Dataset</span>
+                <span class="text-lg font-bold text-gray-800">
+            {% if model_info.data_size %}
+                {{ model_info.data_size }} registros
+            {% else %}
+                No disponible
+            {% endif %}
+        </span>
             </div>
         </div>
     </div>
 
-    <script>
-        // Animaciones personalizadas usando Tailwind CSS
-        tailwind.config = {
-            theme: {
-                extend: {
-                    animation: {
-                        'fade-in': 'fadeIn 1s ease-in-out',
-                        'fade-in-up': 'fadeInUp 1s ease-in-out',
-                        'slide-in': 'slideIn 1s ease-out'
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: 0 },
-                            '100%': { opacity: 1 }
-                        },
-                        fadeInUp: {
-                            '0%': { opacity: 0, transform: 'translateY(20px)' },
-                            '100%': { opacity: 1, transform: 'translateY(0)' }
-                        },
-                        slideIn: {
-                            '0%': { opacity: 0, transform: 'translateX(100px)' },
-                            '100%': { opacity: 1, transform: 'translateX(0)' }
-                        }
-                    }
+</div>
+
+
+<script>
+    const prediction = "{{ prediction|default:'' }}";
+
+    function loadParticles(config, backgroundColor) {
+
+        document.getElementById("particles-js").style.backgroundColor = backgroundColor;
+
+
+        particlesJS("particles-js", config);
+    }
+
+    if (prediction === "Soleado") {
+        loadParticles({
+            particles: {
+                number: {value: 60, density: {enable: true, value_area: 800}},
+                color: {value: "#FFD700"},
+                shape: {
+                    type: "circle",
+                    stroke: {width: 1, color: "#FFFAE6"}
+                },
+                opacity: {
+                    value: 0.8,
+                    random: true,
+                    anim: {enable: true, speed: 1.5, opacity_min: 0.3, sync: false}
+                },
+                size: {
+                    value: 75,
+                    random: true,
+                    anim: {enable: true, speed: 3, size_min: 5, sync: false}
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
                 }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: {enable: true, mode: "bubble"},
+                    onclick: {enable: true, mode: "repulse"},
+                    resize: true
+                },
+                modes: {
+                    bubble: {distance: 200, size: 25, duration: 2, opacity: 0.5, speed: 3},
+                    repulse: {distance: 150, duration: 0.4}
+                }
+            },
+            retina_detect: true
+        }, "rgba(255, 255, 224, 0.5)");
+    } else if (prediction === "Tormenta") {
+        loadParticles({
+            particles: {
+                number: {value: 200, density: {enable: false}},
+                color: {value: "#FFD700"},
+                shape: {
+                    type: "line",
+                    stroke: {width: 3, color: "#FFD700"}
+                },
+                opacity: {
+                    value: 0.8,
+                    anim: {enable: true, speed: 1, opacity_min: 0.1, sync: false}
+                },
+                size: {
+                    value: 25,
+                    random: true,
+                    anim: {enable: false}
+                },
+                move: {
+                    enable: true,
+                    speed: 40,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "bounce",
+                    attract: {enable: true, rotateX: 600, rotateY: 1200}
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: {enable: true, mode: "repulse"},
+                    onclick: {enable: true, mode: "push"},
+                    resize: true
+                },
+                modes: {
+                    repulse: {distance: 200, duration: 0.4},
+                    push: {particles_nb: 5},
+                    remove: {particles_nb: 2}
+                }
+            },
+            retina_detect: true
+        }, "rgba(20, 20, 20, 1)");
+    } else if (prediction === "Lluvia") {
+        loadParticles({
+            particles: {
+                number: {value: 120, density: {enable: true, value_area: 800}},
+                color: {value: "#4682B4"},
+                shape: {type: "circle"},
+                opacity: {value: 0.7},
+                size: {value: 4},
+                move: {enable: true, speed: 15, direction: "bottom"}
             }
-        }
-    </script>
+        }, "rgba(135, 206, 250, 0.9)");
+    } else if (prediction === "Niebla") {
+        loadParticles({
+            particles: {
+                number: {value: 40, density: {enable: true, value_area: 800}},
+                color: {value: "#B0C4DE"},
+                shape: {type: "circle"},
+                opacity: {value: 0.5},
+                size: {value: 50},
+                move: {enable: true, speed: 2, direction: "none", random: true}
+            }
+        }, "rgba(169, 169, 169, 0.8)");
+    } else if (prediction === "Nublado") {
+        loadParticles({
+            particles: {
+                number: {value: 60, density: {enable: true, value_area: 800}},
+                color: {value: "#A9A9A9"},
+                shape: {type: "circle"},
+                opacity: {value: 0.8},
+                size: {value: 12},
+                move: {enable: true, speed: 3, direction: "top", random: false}
+            }
+        }, "rgba(100, 100, 100, 0.9)");
+    } else {
+
+        loadParticles({
+            particles: {
+                number: {value: 50, density: {enable: true, value_area: 800}},
+                color: {value: "#FFFFFF"},
+                shape: {type: "circle"},
+                opacity: {
+                    value: 0.5,
+                    random: true,
+                    anim: {enable: true, speed: 1, opacity_min: 0.1, sync: false}
+                },
+                size: {
+                    value: 10,
+                    random: true,
+                    anim: {enable: true, speed: 2, size_min: 5, sync: false}
+                },
+                move: {
+                    enable: true,
+                    speed: 1,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "bounce",
+                    bounce: true
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: {enable: true, mode: "grab"},
+                    onclick: {enable: true, mode: "push"},
+                    resize: true
+                },
+                modes: {
+                    grab: {distance: 140, line_linked: {opacity: 0.5}},
+                    push: {particles_nb: 4}
+                }
+            },
+            retina_detect: true
+        }, "rgba(0, 0, 0, 0.8)");
+    }
+</script>
+
 
 </body>
 

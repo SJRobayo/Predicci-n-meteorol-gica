@@ -1,20 +1,20 @@
+import json
+
 from django.shortcuts import render
 from .forms import PredictionForm
 import joblib
 import os
 
-# Obtener el directorio base del proyecto
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Rutas de los archivos guardados
 MODEL_PATH = os.path.join(BASE_DIR, "proyecto3", "model", "svc_model.joblib")
 SCALER_PATH = os.path.join(BASE_DIR, "proyecto3", "model", "scaler.joblib")
+STATS_PATH = os.path.join(BASE_DIR, "proyecto3", "model", "model_stats.json")
 
-# Cargar el modelo y el escalador correctamente
-model = joblib.load(MODEL_PATH)  # Modelo SVC
-scaler = joblib.load(SCALER_PATH)  # StandardScaler
 
-# Diccionario de mapeo de resultados
+model = joblib.load(MODEL_PATH)
+scaler = joblib.load(SCALER_PATH)
+
 weather_map = {
     1: {"description": "Tormenta", "image": "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExb3J2bWprZjYya3hoY25jdWI1NDFhaTU5ZmxtbG95dzBiZTZlc3JjZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/gKfyusl0PRPdTNmwnD/giphy.gif"},
     2: {"description": "Lluvia", "image": "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbWxvOXJteDF6dHJkejFvemtzNDc0N296cnE5ZnpkNnFhYmU1NGJkMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/pNn4hlkovWAHfpLRRD/giphy.gif"},
@@ -29,21 +29,30 @@ def predict_view(request):
     image_url = None
     error = None
 
+    # Cargar estadísticas del modelo
+    if os.path.exists(STATS_PATH):
+        with open(STATS_PATH, 'r') as stats_file:
+            model_info = json.load(stats_file)
+    else:
+        model_info = {
+            "name": "SVC (Suppor Vector Machine)",
+            "accuracy": "No disponible",
+            "classification_report": {},
+            "confusion_matrix": [],
+            "data_size": "No disponible",
+            "last_trained": "No disponible"
+        }
+
     if request.method == "POST":
         form = PredictionForm(request.POST)
         if form.is_valid():
-            # Extraer datos del formulario
             wind = form.cleaned_data['wind']
             precipitation = form.cleaned_data['precipitation']
 
             try:
-                # Escalar los datos ingresados
-                X_input = scaler.transform([[wind, precipitation]])  # Usar el scaler para transformar
+                X_input = scaler.transform([[wind, precipitation]])
+                weather_id = model.predict(X_input)[0]
 
-                # Realizar la predicción
-                weather_id = model.predict(X_input)[0]  # Predecir usando el modelo
-
-                # Obtener descripción e imagen
                 if weather_id in weather_map:
                     weather_description = weather_map[weather_id]["description"]
                     image_url = weather_map[weather_id]["image"]
@@ -61,5 +70,6 @@ def predict_view(request):
         'form': form,
         'prediction': weather_description,
         'image_url': image_url,
-        'error': error
+        'error': error,
+        'model_info': model_info
     })
