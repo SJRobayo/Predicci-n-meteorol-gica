@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-oaqy_u$=)h(k@!y*slcsu9(*a1ff7xv*vy_c!z1&bdakr4c0dv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['prediccion-meteorologica.onrender.com']
 
 
 # Application definition
@@ -128,7 +128,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "proyecto3/static",  # La ruta absoluta al directorio de estáticos
 ]
 
-ALLOWED_HOSTS = ['prediccion-meteorologica.onrender.com']
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
