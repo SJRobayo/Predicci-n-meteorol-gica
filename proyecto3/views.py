@@ -35,7 +35,7 @@ def predict_view(request):
             model_info = json.load(stats_file)
     else:
         model_info = {
-            "name": "SVC (Suppor Vector Machine)",
+            "name": "SVC (Support Vector Machine)",
             "accuracy": "No disponible",
             "classification_report": {},
             "confusion_matrix": [],
@@ -66,10 +66,14 @@ def predict_view(request):
     else:
         form = PredictionForm()
 
+    weather_descriptions = [weather_map[i]["description"] for i in sorted(weather_map.keys())]
+
     return render(request, 'base.html', {
         'form': form,
         'prediction': weather_description,
         'image_url': image_url,
         'error': error,
-        'model_info': model_info
+        'model_info': model_info,
+        'confusion_matrix': model_info.get('confusion_matrix', []),
+        'weather_descriptions': weather_descriptions  # Pasar las descripciones al contexto
     })

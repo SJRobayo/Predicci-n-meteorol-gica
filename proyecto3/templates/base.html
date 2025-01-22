@@ -65,17 +65,40 @@
                     <div class="text-lg font-bold text-gray-800">{{ prediction }}</div>
                 </div>
 
+                <!-- Mensaje basado en la predicción -->
+                <div class="text-center mb-4">
+                    {% if prediction == "Tormenta" %}
+                        <p class="text-sm font-medium text-red-600">¡Cuidado! Se esperan tormentas intensas. Mantente
+                            seguro.</p>
+                    {% elif prediction == "Lluvia" %}
+                        <p class="text-sm font-medium text-blue-600">Lleva un paraguas, hay alta probabilidad de
+                            lluvia.</p>
+                    {% elif prediction == "Nublado" %}
+                        <p class="text-sm font-medium text-gray-600">El día estará nublado, ideal para quedarse en
+                            casa.</p>
+                    {% elif prediction == "Niebla" %}
+                        <p class="text-sm font-medium text-gray-600">Precaución al conducir, la niebla puede dificultar
+                            la visibilidad.</p>
+                    {% elif prediction == "Soleado" %}
+                        <p class="text-sm font-medium text-yellow-600">Un día soleado perfecto para salir al aire
+                            libre.</p>
+                    {% else %}
+                        <p class="text-sm font-medium text-gray-600">El clima no pudo ser determinado.</p>
+                    {% endif %}
+                </div>
+
                 <div class="rounded-lg overflow-hidden shadow-lg h-40 w-full bg-gray-100 flex items-center justify-center">
                     <img src="{{ image_url }}" alt="Imagen del Clima" class="h-full w-full object-cover">
                 </div>
             {% else %}
-                   <div class="text-center mb-4">
+                <div class="text-center mb-4">
                     <p class="text-gray-600 text-xs">Predicción del Clima:</p>
                     <div class="text-lg font-bold text-gray-800">Por determinar</div>
                 </div>
 
                 <div class="rounded-lg overflow-hidden shadow-lg h-40 w-full bg-gray-100 flex items-center justify-center">
-                    <img src="https://media.tenor.com/Rz44DhwBh_gAAAAi/smw-block.gif" alt="Imagen del Clima" class="h-full w-full object-cover">
+                    <img src="https://media.tenor.com/Rz44DhwBh_gAAAAi/smw-block.gif" alt="Imagen del Clima"
+                         class="h-full w-full object-cover">
                 </div>
             {% endif %}
         </div>
@@ -86,50 +109,88 @@
     <div class="bg-white rounded-lg shadow-lg p-6 w-2/3 h-full ml-4">
         <h2 class="text-xl font-bold text-gray-800 text-center mb-4">Detalles del Modelo</h2>
 
-        <!-- Grid de Detalles -->
         <div class="grid grid-cols-2 gap-4">
-            <!-- Caja: Nombre del Modelo -->
             <div class="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center justify-center">
                 <span class="text-sm font-semibold text-gray-600">Nombre del Modelo</span>
                 <span class="text-lg font-bold text-gray-800">SVM </span>
             </div>
 
-            <!-- Caja: Precisión -->
             <div class="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center justify-center">
                 <span class="text-sm font-semibold text-gray-600">Precisión</span>
                 <span class="text-lg font-bold text-gray-800">
-            {% if model_info.accuracy %}
-                {{ model_info.accuracy|floatformat:2 }} / 1
-            {% else %}
-                No disponible
-            {% endif %}
-        </span>
+                {% if model_info.accuracy %}
+                    {{ model_info.accuracy|floatformat:2 }} / 1
+                {% else %}
+                    No disponible
+                {% endif %}
+            </span>
             </div>
 
             <!-- Caja: Última Actualización -->
             <div class="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center justify-center">
                 <span class="text-sm font-semibold text-gray-600">Última Actualización</span>
                 <span class="text-lg font-bold text-gray-800">
-            {% if model_info.last_trained %}
-                {{ model_info.last_trained }}
-            {% else %}
-                No disponible
-            {% endif %}
-        </span>
+                {% if model_info.last_trained %}
+                    {{ model_info.last_trained }}
+                {% else %}
+                    No disponible
+                {% endif %}
+            </span>
             </div>
 
-            <!-- Caja: Tamaño del Dataset -->
             <div class="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center justify-center">
                 <span class="text-sm font-semibold text-gray-600">Tamaño del Dataset</span>
                 <span class="text-lg font-bold text-gray-800">
-            {% if model_info.data_size %}
-                {{ model_info.data_size }} registros
-            {% else %}
-                No disponible
-            {% endif %}
-        </span>
+                {% if model_info.data_size %}
+                    {{ model_info.data_size }} registros
+                {% else %}
+                    No disponible
+                {% endif %}
+            </span>
             </div>
         </div>
+
+        <div class="mt-6">
+            <h3 class="text-lg font-bold text-gray-800 text-center mb-4">Matriz de Confusión</h3>
+            <table class="table-auto w-full text-xs border-collapse border border-gray-300 confusion-matrix">
+                <thead>
+                <tr class="bg-gray-100">
+                    <th class="border border-gray-300 px-2 py-1">Predicción \ Real</th>
+                    <th class="border border-gray-300 px-2 py-1">Tormenta</th>
+                    <th class="border border-gray-300 px-2 py-1">Lluvia</th>
+                    <th class="border border-gray-300 px-2 py-1">Nublado</th>
+                    <th class="border border-gray-300 px-2 py-1">Niebla</th>
+                    <th class="border border-gray-300 px-2 py-1">Soleado</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in confusion_matrix %}
+                    <tr>
+                        <td class="border border-gray-300 px-2 py-1 text-center">
+                            {% if forloop.counter == 1 %}Tormenta
+                            {% elif forloop.counter == 2 %}Lluvia
+                            {% elif forloop.counter == 3 %}Nublado
+                            {% elif forloop.counter == 4 %}Niebla
+                            {% elif forloop.counter == 5 %}Soleado
+                            {% else %}Desconocido{% endif %}
+                        </td>
+                        {% for cell in row %}
+                            <td class="border border-gray-300 px-2 py-1 text-center">{{ cell }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-4">
+            <p class="text-sm text-gray-600">
+                Para obtener más información acerca de las estadísticas climáticas,
+                <a href="/estadisticas-climaticas" class="text-blue-500 hover:underline">pulse aquí</a>.
+            </p>
+        </div>
+
+
     </div>
 
 </div>
