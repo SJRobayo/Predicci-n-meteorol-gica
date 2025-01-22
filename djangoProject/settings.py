@@ -55,7 +55,9 @@ MIDDLEWARE = [
     'django_browser_reload.middleware.BrowserReloadMiddleware',
 
 ]
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://prediccion-meteorologica.onrender.com',
+]
 ROOT_URLCONF = 'djangoProject.urls'
 
 TEMPLATES = [
