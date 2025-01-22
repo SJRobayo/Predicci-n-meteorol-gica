@@ -46,7 +46,7 @@
                 </div>
                 <div>
                     <label for="precipitation" class="block text-xs font-medium text-gray-700">Precipitación
-                        (ml/m²)</label>
+                        (l/m²)</label>
                     <input type="number" name="precipitation" id="precipitation"
                            class="w-full mt-1 p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none text-xs">
                 </div>
@@ -258,13 +258,13 @@
         loadParticles({
             particles: {
                 number: {value: 60, density: {enable: true, value_area: 800}},
-                color: {value: "#A9A9A9"},
+                color: {value: "#FFFFFF"},
                 shape: {type: "circle"},
                 opacity: {value: 0.8},
-                size: {value: 12},
-                move: {enable: true, speed: 3, direction: "top", random: false}
+                size: {value: 75},
+                move: {enable: true, speed: 1, direction: "random", random: true}
             }
-        }, "rgba(100, 100, 100, 0.9)");
+        }, "rgba(135, 206, 235, 0.9)");
     } else {
 
         loadParticles({
