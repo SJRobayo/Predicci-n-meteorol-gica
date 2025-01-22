@@ -128,6 +128,8 @@ STATICFILES_DIRS = [
     BASE_DIR / "proyecto3/static",  # La ruta absoluta al directorio de estáticos
 ]
 
+ALLOWED_HOSTS = ['prediccion-meteorologica.onrender.com']
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
