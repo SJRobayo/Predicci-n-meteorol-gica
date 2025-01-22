@@ -21,6 +21,6 @@ from .views import predict_view
 from proyecto3 import views
 
 urlpatterns = [
-    path('/predict/', predict_view, name='predict'),
-
+    path('', predict_view, name='home'),  # Ruta para la raíz
+    path('predict/', predict_view, name='predict'),  # Ruta predict
 ]
