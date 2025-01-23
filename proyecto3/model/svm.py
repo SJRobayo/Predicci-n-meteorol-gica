@@ -1,44 +1,37 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import classification_report
 from imblearn.over_sampling import SMOTE
 from collections import Counter
-import matplotlib.pyplot as plt
 
-def main():
-    print("=== Clasificación del Clima con SVC ===")
 
-    file_path = "C:/Users/Sami/PycharmProjects/proyecto 3/proyecto3/csv/clean_observations.csv"
+def find_optimal_hyperparameters(file_path):
+    print("=== Optimización Exhaustiva de Hiperparámetros para SVC ===")
 
     try:
         df = pd.read_csv(file_path)
         print("\nVista previa del dataset:")
         print(df.head())
 
-        # Limpiar nombres de columnas
-        df.columns = df.columns.str.strip()  # Elimina espacios al inicio y final de los nombres
+        df.columns = df.columns.str.strip()
         print("\nColumnas del dataset:")
         print(df.columns)
     except Exception as e:
         print(f"Error al leer el archivo: {e}")
         return
 
-    # Variables de interés
-    features = [ 'wind', 'precipitation']
+    features = ['wind', 'precipitation']
     target = 'weather_id'
 
-    # Verificación de columnas
     if target not in df.columns or not all(f in df.columns for f in features):
         print("Error: Las columnas seleccionadas no están en el dataset.")
         return
 
-    # Preprocesamiento
     X = df[features]
     y = df[target]
 
-    # Escalado
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
@@ -58,41 +51,34 @@ def main():
         print(f"Error al aplicar SMOTE: {e}")
         return
 
-    # División de datos
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Configuración del modelo
-    optimal_model = SVC(
-        C=100,
-        gamma=0.1,
-        kernel='rbf',
-        class_weight='balanced',
-        probability=True
-    )
+    svc = SVC(class_weight='balanced', probability=True)
 
-    # Entrenamiento
-    print("Entrenando modelo SVC...")
-    optimal_model.fit(X_train, y_train)
+    param_grid = {
+        'C': [0.01, 0.1, 1, 10, 100, 1000],
+        'gamma': [1, 0.1, 0.01, 0.001, 0.0001],
+        'kernel': ['linear', 'rbf', 'poly', 'sigmoid']
+    }
 
-    # Predicciones
-    y_pred = optimal_model.predict(X_test)
+    # GridSearchCV
+    grid = GridSearchCV(svc, param_grid, refit=True, scoring='accuracy', cv=5, verbose=3)
+    print("\nBuscando hiperparámetros óptimos...")
+    grid.fit(X_train, y_train)
 
-    # Evaluación
-    print("\nReporte de clasificación:")
+    print("\nMejores parámetros encontrados:")
+    print(grid.best_params_)
+
+    best_model = grid.best_estimator_
+    y_pred = best_model.predict(X_test)
+
+    print("\nReporte de clasificación con hiperparámetros óptimos:")
     print(classification_report(y_test, y_pred))
 
-    # Matriz de confusión
-    matriz = confusion_matrix(y_test, y_pred)
-    print("\nMatriz de confusión:")
-    print(matriz)
+    return grid.best_params_
 
-    # Visualización de la matriz de confusión
-    disp = ConfusionMatrixDisplay(confusion_matrix=matriz, display_labels=optimal_model.classes_)
-    disp.plot(cmap=plt.cm.Blues)
-    plt.title("Matriz de Confusión")
-    plt.show()
 
 if __name__ == "__main__":
-    main()
+    file_path = "C:/Users/Sami/PycharmProjects/proyecto 3/proyecto3/csv/clean_observations.csv"
+    optimal_params = find_optimal_hyperparameters(file_path)
+    print(f"Hiperparámetros óptimos: {optimal_params}")

@@ -17,10 +17,7 @@ STATS_PATH = os.path.join(BASE_DIR, "model", "model_stats.json")
 CSV_PATH = os.path.join(BASE_DIR, "csv", "clean_observations.csv")
 
 def train_and_save_model():
-    """
-    Entrena el modelo SVC, lo guarda junto con el escalador y genera estadísticas del modelo.
-    """
-    # Cargar datos
+
     df = pd.read_csv(CSV_PATH)
     features = ['wind', 'precipitation']
     target = 'weather_id'
@@ -31,14 +28,11 @@ def train_and_save_model():
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
-    # Balancear las clases con SMOTE
     smote = SMOTE(random_state=42)
     X_resampled, y_resampled = smote.fit_resample(X_scaled, y)
 
-    # Dividir datos en entrenamiento y prueba
     X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
 
-    # Entrenar el modelo
     model = SVC(
         C=100,
         gamma=0.1,
